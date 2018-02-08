@@ -3,12 +3,14 @@
 using namespace std;
 int arr[9]={0};
 
+long int naman=0;
 struct NODE
 {
     int data;
     int val;
     vector<NODE *> ptr;
-};
+    NODE * parent;
+}*start;
 int check_plus()
 {
     for(int i=0,j=0;i<3;i++,j=j+3)
@@ -72,114 +74,61 @@ void checkwin()
         return ;
     }
 }
-//void treecreate_down(queue <int> q,NODE *temp);
-/*void treecreate_side(queue <int> q,NODE *temp)
-{
-    //cout<<"SIZE = "<<q.size()<<endl;
-    if(q.size()>0)
-    {
-        NODE *t= new NODE;
-        t->right=temp;
-        temp->left=t;
-        t->data=q.front();
-        treecreate_down(q,t);
-        q.pop();
-        //cout<<t->data<<" (side of "<<temp->data<<" )\n";
-        treecreate_side(q,t);
-
-    }
-}
-void treecreate_down(queue <int> q,NODE *temp)
-{
-    if(!q.empty())
-    {
-     NODE *t= new NODE;
-     temp->down=t;
-     t->up=temp;
-     t->data=q.front();
-     q.pop();
-     //cout<<t->data<<" (down "<<temp->data<<" )\n";
-     treecreate_side(q,t);
-     treecreate_down(q,t);
-    }
-}*/
 void treecreate(queue <int> q,NODE *temp )
 {
     for(int i=0;q.size()>0;i++)
     {
-        //cout<<q.front()<<" ";
         NODE *t= new NODE;
         t->data=q.front();
-        //cout<<"  YOV : "<<t->data<<endl;
-        q.pop();
-       // treecreate(q,t);
-
+        t->parent=temp;
         temp->ptr.push_back(t);
+        q.pop();
+    }
+    vector <NODE *>::iterator it =temp->ptr.begin();
+    while(it!=temp->ptr.end())
+    {
+        queue<int> qtemp;
+        for(vector <NODE *>::iterator ittemp =temp->ptr.begin();ittemp!=temp->ptr.end();++ittemp)
+        {
+            if((*it)->data != (*ittemp)->data)
+            {
+                qtemp.push((*ittemp)->data);
+            }
+        }
+        treecreate(qtemp,*it);
+        it++;
     }
 }
-/*void treecreate_down(queue <int> q,NODE *temp)
-{
-    if(q.empty())
-    {
-        NODE *t= new NODE;
-        temp->down=t;
-        t->up=temp;
-        t->data=q.front();
-        q.pop();
-        treecreate_side(q,t);
-    }
-        else
-        {
-            while(temp->right!=NULL)
-            {
-                temp=temp->right;
-            }
-            temp->right=t;
-            t->left=temp;
-            t->data=q.front();
-            cout<<t->data<<"->";
-            q.pop();
-            treecreate(q,t,si);
-            //treecreate(q,t,si-1);
-        }
-        cout<<endl;
-
-    }
-    else
-    {
-        return;
-    }
-}*/
 void showtree(NODE * temp)
 {
     for(vector <NODE *>::iterator it =temp->ptr.begin();it != temp->ptr.end();++it)
     {
         cout<<(*it)->data<<" ";
+        showtree(*it);
+        naman++;
     }
     cout<<endl;
 }
+
 void aiinit()
 {
     queue<int> q;
-    NODE *start=new NODE;
-    for(int i=0;i<4;i++)
+    NODE *temp=new NODE;
+    start=temp;
+    start->parent=NULL;
+    for(int i=0;i<9;i++)
     {
         if(arr[i]==0)
         {
             q.push(i);
-            //cout<<"Pushing = "<<i<<endl;
         }
         else
         {
             start->data=i;
         }
     }
-    //cout<<"size ="<<q.size()<<endl;
     treecreate(q,start);
     showtree(start);
-   /* showtree(start->ptr[0],2);
-    showtree(start->ptr[1],2);
-    showtree(start->ptr[2],2);*/
 }
 
 int main()
@@ -193,5 +142,6 @@ int main()
     }
    // showmap();
     //checkwin();*/
+    cout<<"NAMAN = "<<naman;
     return 0;
 }
