@@ -2,8 +2,8 @@
 #include<queue>
 using namespace std;
 int arr[9]={0};
-
-long int naman=0;
+int temparr[9];
+int x;
 struct NODE
 {
     int data;
@@ -11,6 +11,20 @@ struct NODE
     vector<NODE *> ptr;
     NODE * parent;
 }*start;
+void set_temp_arr()
+{
+    for(int i=0;i<9;i++)
+    {
+        if(arr[i]!=x)
+        {
+            temparr[i]=0;
+        }
+        else
+        {
+            temparr[i]=1;
+        }
+    }
+}
 int check_plus()
 {
     for(int i=0,j=0;i<3;i++,j=j+3)
@@ -35,7 +49,6 @@ bool check_x()
 }
 void userinput(int i)
 {
-    int x;
     cin>>x;
     switch(x)
     {
@@ -86,7 +99,8 @@ void treecreate(queue <int> q,NODE *temp )
     }
     vector <NODE *>::iterator it =temp->ptr.begin();
     while(it!=temp->ptr.end())
-    {
+    {  cout<<"TEMP : "<<temp->data<<endl;
+        cout<<"it : "<<(*it)->data<<endl;
         queue<int> qtemp;
         for(vector <NODE *>::iterator ittemp =temp->ptr.begin();ittemp!=temp->ptr.end();++ittemp)
         {
@@ -97,26 +111,41 @@ void treecreate(queue <int> q,NODE *temp )
         }
         treecreate(qtemp,*it);
         it++;
+    }//agar temp pe calculated value nahi hai to check kar varna mat kar
+    while(temp->parent!=NULL)
+    {
+        temparr[temp->data]=1;
+        temp=temp->parent;
     }
+    cout<<endl<<"ARRAY : ";
+    for(int i=0;i<9;i++)
+    {
+        cout<<temparr[i]<<" ";
+    }
+    cout<<endl;
+    set_temp_arr();
+    //temp=temp->parent;*/
+    //cout<<endl<<"//////////////////"<<"\nTEMP : "<<temp->data<<endl<<"//////////////////"<<endl;
+    //cout<<endl<<"TEMP : "<<temp->parent->data<<endl;
 }
 void showtree(NODE * temp)
 {
     for(vector <NODE *>::iterator it =temp->ptr.begin();it != temp->ptr.end();++it)
     {
-        cout<<(*it)->data<<" ";
+        cout<<(*it)->data<<" P : "<<(*it)->parent->data<<endl;
         showtree(*it);
-        naman++;
     }
     cout<<endl;
 }
 
 void aiinit()
 {
+    set_temp_arr();
     queue<int> q;
     NODE *temp=new NODE;
     start=temp;
     start->parent=NULL;
-    for(int i=0;i<9;i++)
+    for(int i=0;i<4;i++)
     {
         if(arr[i]==0)
         {
@@ -136,12 +165,12 @@ int main()
     showmap();
     userinput(1);
     aiinit();
+    showmap();
     /*for(int i=1;i<3;i++)
     {
         //aiinput();
     }
    // showmap();
     //checkwin();*/
-    cout<<"NAMAN = "<<naman;
     return 0;
 }
