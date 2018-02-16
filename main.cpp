@@ -2,12 +2,12 @@
 #include<queue>
 using namespace std;
 int arr[9]={0};
-int temparr[9];
 struct NODE
 {
     int data;
     int val;
     char turn;
+    int arr[9]={0};
     vector<NODE *> ptr;
     NODE * parent;
     NODE()
@@ -16,20 +16,6 @@ struct NODE
         parent=NULL;
     }
 }*start,*t1;
-void set_temp_arr()
-{
-    for(int i=0;i<9;i++)
-    {
-        if(arr[i]==0)
-        {
-            temparr[i]=0;
-        }
-        else
-        {
-            temparr[i]=1;
-        }
-    }
-}
 int userinput()
 {
     int x;
@@ -44,7 +30,7 @@ void showmap()
         (i==2 || i==5)?cout<<arr[i]<<endl:cout<<arr[i]<<" ";
     }
 }
-int check_plus()
+int check_plus(int temparr[])
 {
     for(int i=0,j=0;i<3;i++,j=j+3)
     {
@@ -62,20 +48,20 @@ int check_plus()
     else
         return 0;
 }
-bool check_x()
+bool check_x(int temparr[])
 {
     if((temparr[0]==temparr[4] && temparr[4]==temparr[8]) || (temparr[2]==temparr[4] && temparr[4]==temparr[6]))
         return true;
     else
         return false;
 }
-int checkwin()
+int checkwin(int temparr[])
 {
-    if(check_x())
-    {//cout<<temparr[4]<<" "<<arr[4]<<endl;
+    if(check_x(temparr))
+    {
         return temparr[4];
     }
-    return(check_plus());
+    return(check_plus(temparr));
 }
 void treecreate(queue <int> q,NODE *temp )
 {
@@ -85,48 +71,31 @@ void treecreate(queue <int> q,NODE *temp )
         NODE *t= new NODE;
         t->data=q.front();
         t->parent=temp;
+        copy(temp->arr,temp->arr+9,t->arr);
         if(t->parent->turn=='U')
         {
+            t->arr[t->data]=2;
             t->turn='C';
         }
         else if(t->parent->turn=='C')
         {
+            t->arr[t->data]=1;
             t->turn='U';
         }
         temp->ptr.push_back(t);
         q.pop();
     }
-    //cout<<" TEMP : "<<temp->data<<endl;
-    if(temp->ptr.size()<=3)
-    {//cout<<" TEMP : "<<temp->data<<endl;
-        t1=temp;
-        while(t1->parent!=NULL)
-        {
-            if(t1->turn=='U')
-            {
-                temparr[t1->data]=1;
-            }
-            else if(t1->turn=='C')
-            {
-                temparr[t1->data]=2;
-            }
-            t1=t1->parent;
-        }
-        //cout<<" TEMP : "<<temp->data<<endl;
-        /*cout<<"ARRAY : ";
-                for(int i=0;i<9;i++)
-                {
-                    cout<<temparr[i]<<" ";
-                }
-                cout<<endl<<endl;*/
-        flag=checkwin();
-        //cout<<"FLAG = "<<flag<<endl;
+    if(temp->ptr.size()<5)
+    {
+        flag=checkwin(temp->arr);
         if(flag==0)
         {
+            temp->ptr.clear();
             //cout<<"DRAW";
         }
         else if(flag!=-1)
         {
+            temp->ptr.clear();
             t1=temp;
             while(t1->parent!=NULL)
             {
@@ -140,15 +109,13 @@ void treecreate(queue <int> q,NODE *temp )
                 }
                 t1=t1->parent;
             }
-            set_temp_arr();
         }
     }
     if(flag==-1)
     {
         vector <NODE *>::iterator it =temp->ptr.begin();
         while(it!=temp->ptr.end())
-        {  //cout<<"TEMP : "<<temp->data<<endl;
-            //cout<<"it : "<<(*it)->data<<endl;
+        {
             queue<int> qtemp;
             for(vector <NODE *>::iterator ittemp =temp->ptr.begin();ittemp!=temp->ptr.end();++ittemp)
             {
@@ -161,12 +128,13 @@ void treecreate(queue <int> q,NODE *temp )
             it++;
         }
     }
+}
     /*cout<<endl<<"ARRAY : ";
     for(int i=0;i<9;i++)
     {
         cout<<temparr[i]<<" ";
     }
-    cout<<endl;*/
+    cout<<endl;
 }
 /*void showtree(NODE * temp)
 {
@@ -177,17 +145,22 @@ void treecreate(queue <int> q,NODE *temp )
     }
     //cout<<endl;
 }*/
-/*
-void showtree(NODE * temp)  //first choice path
+
+void pathcheck(NODE * temp)  //first choice path
 {
     if(temp->ptr.size()!=0)
     {
-    vector <NODE *>::iterator it =temp->ptr.begin();
-    cout<<(*it)->data<<" P : "<<(*it)->parent->data<<" Value : "<<(*it)->val<<" TURN : "<<(*it)->turn<<endl;
-    showtree(*it);
-    cout<<endl;
+        vector <NODE *>::iterator it;
+        cout<<"P : "<<temp->data<<" TURN : "<<temp->turn<<endl;
+        for(it =temp->ptr.begin();it != temp->ptr.end();++it)
+        {
+            cout<<"D:"<<(*it)->data<<" V:"<<(*it)->val<<endl;
+        }
+        it=temp->ptr.begin();
+        cout<<endl<<endl;
+        pathcheck(*it);
     }
-}*/
+}
 void showtree(NODE * temp)      //all moves at this point
 {
     for(vector <NODE *>::iterator it =temp->ptr.begin();it != temp->ptr.end();++it)
@@ -214,7 +187,6 @@ void cpu_turn(NODE * temp)
 }
 void aiinit()
 {
-    set_temp_arr();
     queue<int> q;
     NODE *temp=new NODE;
     start=temp;
@@ -227,13 +199,14 @@ void aiinit()
         }
         else
         {
+            start->arr[i]=1;
             start->data=i;
         }
     }
     treecreate(q,start);
-    showtree(start);
-    cout<<endl;
-    cpu_turn(start);
+    //showtree(start);
+    //cout<<endl;
+    //cpu_turn(start);
 }
 void user_turn()
 {
@@ -252,6 +225,8 @@ int main()
     showmap();
     userinput();
     aiinit();
+    pathcheck(start);
+    /*
     for(int i=0;i<3;i++)
     {
         cout<<endl;
@@ -260,12 +235,10 @@ int main()
         cout<<endl;
         showtree(start);
         cpu_turn(start);
-    }
-   // showmap();
+        cout<<endl;
+        showtree(start);
+    }*/
+    //showmap();
     //checkwin();*/
     return 0;
 }
-/*problems -
-1.everytime stops after 6 input_iterator_tag
-2. in _ 1 0 1 0 1 0 1 _ it doent stop on win of 0
-*/
