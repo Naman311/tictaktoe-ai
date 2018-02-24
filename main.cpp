@@ -5,14 +5,15 @@ int arr[9]={0};
 struct NODE
 {
     int data;
-    int val;
+    int val1;
+    int val2;
     char turn;
     int arr[9]={0};
     vector<NODE *> ptr;
     NODE * parent;
     NODE()
     {
-        val=0;
+        //val=-10;
         parent=NULL;
     }
 }*start,*t1;
@@ -76,11 +77,13 @@ void treecreate(queue <int> q,NODE *temp )
         {
             t->arr[t->data]=2;
             t->turn='C';
+            t->val1=30;
         }
         else if(t->parent->turn=='C')
         {
             t->arr[t->data]=1;
             t->turn='U';
+            t->val1=-10;
         }
         temp->ptr.push_back(t);
         q.pop();
@@ -88,26 +91,55 @@ void treecreate(queue <int> q,NODE *temp )
     if(temp->ptr.size()<5)
     {
         flag=checkwin(temp->arr);
-        if(flag==0)
-        {
+        if(flag!=-1)
+        {//1 for user 2 for cpu 0 for draw
             temp->ptr.clear();
-            //cout<<"DRAW";
-        }
-        else if(flag!=-1)
-        {
-            temp->ptr.clear();
+            if(flag==1)
+            {
+                temp->val1=0;
+            }
+            else if(flag==2)
+            {
+                temp->val1=20;
+            }
+            else
+            {
+                temp->val1=10;
+            }
             t1=temp;
             while(t1->parent!=NULL)
             {
-                if(flag==2)
+                t1=t1->parent;
+                if(t1->turn=='C')
+                {
+                    for(vector <NODE *>::iterator it=t1->ptr.begin();it!=t1->ptr.end();++it)
+                    {
+                        if((*it)->val1<t1->val1 && (*it)->val1!=-10)
+                        {
+                            //cout<<(*it)->val<<"  "<<t1->val<<"   ";
+                            t1->val1=(*it)->val1;
+                            //cout<<(*it)->val<<"  "<<t1->val<<endl;
+                        }
+                    }
+                }
+                else if(t1->turn=='U')
+                {
+                    for(vector <NODE *>::iterator it=t1->ptr.begin();it!=t1->ptr.end();++it)
+                    {
+                        if((*it)->val1>t1->val1 && (*it)->val1!=30)
+                        {
+                            t1->val1=(*it)->val1;
+                        }
+                    }
+                }
+                /*if(flag==2)
                 {
                     (t1->val)++;
                 }
                 else if(flag==1)
                 {
                     (t1->val)--;
-                }
-                t1=t1->parent;
+                }*/
             }
         }
     }
@@ -154,7 +186,7 @@ void pathcheck(NODE * temp)  //first choice path
         cout<<"P : "<<temp->data<<" TURN : "<<temp->turn<<endl;
         for(it =temp->ptr.begin();it != temp->ptr.end();++it)
         {
-            cout<<"D:"<<(*it)->data<<" V:"<<(*it)->val<<endl;
+            cout<<"D:"<<(*it)->data<<" V:"<<(*it)->val1<<endl;
         }
         it=temp->ptr.begin();
         cout<<endl<<endl;
@@ -165,7 +197,7 @@ void showtree(NODE * temp)      //all moves at this point
 {
     for(vector <NODE *>::iterator it =temp->ptr.begin();it != temp->ptr.end();++it)
     {
-        cout<<(*it)->data<<" P : "<<(*it)->parent->data<<" Value : "<<(*it)->val<<" TURN : "<<(*it)->turn<<endl;
+        cout<<(*it)->data<<" P : "<<(*it)->parent->data<<" Value : "<<(*it)->val1<<" TURN : "<<(*it)->turn<<endl;
         //showtree(*it);
     }
 }
@@ -175,9 +207,9 @@ void cpu_turn(NODE * temp)
     NODE * tempstart=NULL;
     for(vector <NODE *>::iterator it =temp->ptr.begin();it != temp->ptr.end();++it)
     {
-        if((*it)->val>ma)
+        if((*it)->val1>ma)
         {
-            ma=(*it)->val;
+            ma=(*it)->val1;
             I=(*it)->data;
             tempstart=*it;
         }
@@ -191,6 +223,7 @@ void aiinit()
     NODE *temp=new NODE;
     start=temp;
     start->turn='U';
+    start->val1=-10;
     for(int i=0;i<9;i++)
     {
         if(arr[i]==0)
@@ -204,9 +237,9 @@ void aiinit()
         }
     }
     treecreate(q,start);
-    //showtree(start);
-    //cout<<endl;
-    //cpu_turn(start);
+    showtree(start);
+    cout<<endl;
+    cpu_turn(start);
 }
 void user_turn()
 {
@@ -225,8 +258,8 @@ int main()
     showmap();
     userinput();
     aiinit();
-    pathcheck(start);
-    /*
+    //pathcheck(start);
+
     for(int i=0;i<3;i++)
     {
         cout<<endl;
@@ -237,8 +270,8 @@ int main()
         cpu_turn(start);
         cout<<endl;
         showtree(start);
-    }*/
-    //showmap();
+    }
+    showmap();
     //checkwin();*/
     return 0;
 }
