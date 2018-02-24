@@ -13,7 +13,7 @@ struct NODE
     NODE * parent;
     NODE()
     {
-        //val=-10;
+        val2=0;
         parent=NULL;
     }
 }*start,*t1;
@@ -97,14 +97,17 @@ void treecreate(queue <int> q,NODE *temp )
             if(flag==1)
             {
                 temp->val1=0;
+                temp->val2=-1;
             }
             else if(flag==2)
             {
                 temp->val1=20;
+                temp->val2=1;
             }
             else
             {
                 temp->val1=10;
+                temp->val2=0;
             }
             t1=temp;
             while(t1->parent!=NULL)
@@ -132,14 +135,14 @@ void treecreate(queue <int> q,NODE *temp )
                         }
                     }
                 }
-                /*if(flag==2)
+                if(flag==2)
                 {
-                    (t1->val)++;
+                    (t1->val2)++;
                 }
                 else if(flag==1)
                 {
-                    (t1->val)--;
-                }*/
+                    (t1->val2)--;
+                }
             }
         }
     }
@@ -197,19 +200,27 @@ void showtree(NODE * temp)      //all moves at this point
 {
     for(vector <NODE *>::iterator it =temp->ptr.begin();it != temp->ptr.end();++it)
     {
-        cout<<(*it)->data<<" P : "<<(*it)->parent->data<<" Value : "<<(*it)->val1<<" TURN : "<<(*it)->turn<<endl;
+        cout<<(*it)->data<<" P : "<<(*it)->parent->data<<" Value1 : "<<(*it)->val1<<" Value2 : "<<(*it)->val2<<" TURN : "<<(*it)->turn<<endl;
         //showtree(*it);
     }
 }
 void cpu_turn(NODE * temp)
 {
-    int ma=-9999,I;
+    int ma1=-9999,ma2=-9999,I;
     NODE * tempstart=NULL;
     for(vector <NODE *>::iterator it =temp->ptr.begin();it != temp->ptr.end();++it)
     {
-        if((*it)->val1>ma)
+        if((*it)->val1>ma1)
         {
-            ma=(*it)->val1;
+            ma1=(*it)->val1;
+            ma2=(*it)->val2;
+            I=(*it)->data;
+            tempstart=*it;
+        }
+        else if((*it)->val1==ma1 && (*it)->val2>ma2)
+        {
+            ma1=(*it)->val1;
+            ma2=(*it)->val2;
             I=(*it)->data;
             tempstart=*it;
         }
