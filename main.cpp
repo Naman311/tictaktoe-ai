@@ -26,9 +26,16 @@ int userinput()
 }
 void showmap()
 {
+    char ch;
     for(int i=0; i<9;i++)
     {
-        (i==2 || i==5)?cout<<arr[i]<<endl:cout<<arr[i]<<" ";
+        if(arr[i]==0)
+            ch='_';
+        else if(arr[i]==1)
+            ch='X';
+        else
+            ch='O';
+        (i==2 || i==5)?cout<<ch<<endl:cout<<ch<<" ";
     }
 }
 int check_plus(int temparr[])
@@ -101,12 +108,12 @@ void treecreate(queue <int> q,NODE *temp )
             }
             else if(flag==2)
             {
-                temp->val1=20;
+                temp->val1=20;//-(8-temp->ptr.size());
                 temp->val2=1;
             }
             else
             {
-                temp->val1=10;
+                temp->val1=10;//-(8-temp->ptr.size());
                 temp->val2=0;
             }
             t1=temp;
@@ -248,8 +255,8 @@ void aiinit()
         }
     }
     treecreate(q,start);
-    showtree(start);
-    cout<<endl;
+    //showtree(start);
+    //cout<<endl;
     cpu_turn(start);
 }
 void user_turn()
@@ -266,23 +273,50 @@ void user_turn()
 }
 int main()
 {
+    int check_win;
     showmap();
     userinput();
     aiinit();
     //pathcheck(start);
-
-    for(int i=0;i<3;i++)
+    while(true)
     {
         cout<<endl;
         showmap();
         user_turn();
         cout<<endl;
+        check_win=checkwin(arr);
+        if(check_win==1 || check_win==2 || check_win==0)
+        {
+            break;
+        }
+            //1 for user 2 for cpu 0 for draw
         showtree(start);
         cpu_turn(start);
         cout<<endl;
+        check_win=checkwin(arr);
+        if(check_win==1 || check_win==2 || check_win==0)
+        {
+            break;
+        }
         showtree(start);
     }
     showmap();
+    if(check_win==1)
+    {
+        cout<<"X won"<<endl;
+    }
+    else if(check_win==2)
+    {
+        cout<<"O won"<<endl;
+    }
+    else if(check_win==0)
+    {
+        cout<<"Draw"<<endl;
+    }
     //checkwin();*/
     return 0;
 }
+/* problem in
+O _ _
+X X _
+_ _ _*/
