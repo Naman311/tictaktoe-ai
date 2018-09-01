@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1535364075 source:d:\github\tictaktoe-ai\tictactoev2\main.cpp
+	<iostream>
+	<queue>
+
